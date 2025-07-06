@@ -1,6 +1,6 @@
 # Sistema de Gestión de Cervecería
 
-Este proyecto es una base de datos robusta en el backend, y una pagina web para visualizar los datos de una tienda cervecera. El backend fue desarrollado en Supabase, mientras que el forntend fue desarrollado con React y Tailwind CSS. La pagina web permite a los usuarios con diferentes roles (Administrador, Vendedor, Productor) acceder a funcionalidades específicas, incluyendo la gestión de compras, ventas, barriles, lotes y el estado general de la cerveza.
+Este proyecto es la implementacion de una base de datos planificada, diseñada y creada por los miembros del equipo con el agregado de una pagina web para visualizar los datos. El base de datos fue desarrollado en Supabase, mientras que el frontend fue desarrollado con React y Tailwind CSS. La pagina web permite a los usuarios con diferentes roles (Administrador, Vendedor, Productor) acceder a funcionalidades específicas, incluyendo la gestión de compras, ventas, barriles, lotes y el estado general de la cerveza.
 
 ## Características
 
