@@ -59,3 +59,10 @@ Este proyecto es la implementacion de una base de datos planificada, diseñada y
 * **JavaScript (ES6+)**: Para la lógica del lado del cliente.
 
 * **SupaBase**: Como base de datos PostgreSQL en la nube
+
+# Equipo
+- Benjamín Jiménez Ruiz 
+- Alan Ibacache Gonnelli
+- Juan Umaña Silva
+- Gabriela Zambrano Novoa 
+
