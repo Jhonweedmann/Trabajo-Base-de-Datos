@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getBarrels } from "../utils/authService"; // Importa la función para obtener barriles
-import { generarYGuardarBarril} from '../barrelGenerator'; // Importa la función para generar y guardar barriles
+import { generarYGuardarBarril} from '../barrelGenerator.env'; // Importa la función para generar y guardar barriles
+import { generarYGuardarCerveza } from "../cervezaGenerator.env";
 
 function BarrilesPage() {
   const navigate = useNavigate();
@@ -131,44 +132,63 @@ function BarrilesPage() {
         {/* Formulario para agregar nuevo barril */}
       {showAddBarrelForm && (
         <form
-  onSubmit={async (event) => {
-    event.preventDefault();
+        onSubmit={async (event) => {
+  event.preventDefault();
+
+  const nuevaCerveza = {
+    sabor: newBarrelData.SaborPrincipal,
+    grado: parseFloat(newBarrelData.GradoAlcoholico),
+  };
+
+  try {
+    const resultadoCerveza = await generarYGuardarCerveza(nuevaCerveza);
+    const idCerveza = resultadoCerveza.data?.id_cerveza;
+
+    if (resultadoCerveza.error || !idCerveza) {
+      console.error('❌ Error al agregar la cerveza:', resultadoCerveza.error);
+      alert('Error al agregar la cerveza: ' + (resultadoCerveza.error?.message || 'No se obtuvo ID de la cerveza'));
+      return;
+    }
 
     const nuevoBarril = {
       capacidad: parseFloat(newBarrelData.CapacidadLitros),
       esta_lleno_barril: newBarrelData.isFull,
+      id_cerveza: idCerveza, // Ahora sí lo tienes disponible
     };
 
-    try {
-      const resultado = await generarYGuardarBarril(nuevoBarril);
+    const resultadoBarril = await generarYGuardarBarril(nuevoBarril);
 
-      if (resultado.error) {
-        console.error('❌ Error al agregar el barril:', resultado.error);
-        alert('Error al agregar el barril: ' + resultado.error.message);
-      } else {
-        console.log('✅ Barril agregado con éxito:', resultado.data);
-        alert('Barril agregado con éxito.');
-
-        setNewBarrelData({
-          Nombre: '',
-          SaborPrincipal: '',
-          FechaElaboracion: '',
-          Lote: '',
-          GradoAlcoholico: '',
-          CapacidadLitros: '',
-          isFull: false,
-        });
-
-        // Opcional: cerrar el formulario
-        setShowAddBarrelForm(false);
-      }
-    } catch (error) {
-      console.error('❌ Error inesperado:', error);
-      alert('Error inesperado al guardar el barril.');
+    if (resultadoBarril.error) {
+      console.error('❌ Error al agregar el barril:', resultadoBarril.error);
+      alert('Error al agregar el barril: ' + resultadoBarril.error.message);
+      return;
     }
-  }}
+
+    console.log('✅ Barril y cerveza agregados con éxito');
+    alert('Barril y cerveza agregados con éxito');
+
+    setNewBarrelData({
+      Nombre: '',
+      SaborPrincipal: '',
+      FechaElaboracion: '',
+      Lote: '',
+      GradoAlcoholico: '',
+      CapacidadLitros: '',
+      isFull: false,
+    });
+
+    setShowAddBarrelForm(false);
+
+  } catch (error) {
+    console.error('❌ Error inesperado:', error);
+    alert('Error inesperado al guardar datos.');
+  }
+}}
+
   className="bg-blue-50 p-6 rounded-lg shadow-inner mb-8"
 >
+
+
   <h2 className="text-2xl font-semibold text-blue-800 mb-4">
     Nuevo Barril
   </h2>
