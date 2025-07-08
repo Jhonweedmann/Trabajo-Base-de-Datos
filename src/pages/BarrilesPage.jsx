@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getBarrels } from "../utils/authService"; // Importa la función para obtener barriles
+import { generarYGuardarBarril} from '../barrelGenerator'; // Importa la función para generar y guardar barriles
 
 function BarrilesPage() {
   const navigate = useNavigate();
@@ -128,143 +129,158 @@ function BarrilesPage() {
         </div>
 
         {/* Formulario para agregar nuevo barril */}
-        {showAddBarrelForm && (
-          <form
-            onSubmit={handleAddBarrelSubmit}
-            className="bg-blue-50 p-6 rounded-lg shadow-inner mb-8"
-          >
-            <h2 className="text-2xl font-semibold text-blue-800 mb-4">
-              Nuevo Barril
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
-                <label
-                  htmlFor="Nombre"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Nombre de Cerveza
-                </label>
-                <input
-                  type="text"
-                  name="Nombre"
-                  id="Nombre"
-                  value={newBarrelData.Nombre}
-                  onChange={handleNewBarrelChange}
-                  required
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="SaborPrincipal"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Sabor Principal
-                </label>
-                <input
-                  type="text"
-                  name="SaborPrincipal"
-                  id="SaborPrincipal"
-                  value={newBarrelData.SaborPrincipal}
-                  onChange={handleNewBarrelChange}
-                  required
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="FechaElaboracion"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Fecha de Elaboración
-                </label>
-                <input
-                  type="date"
-                  name="FechaElaboracion"
-                  id="FechaElaboracion"
-                  value={newBarrelData.FechaElaboracion}
-                  onChange={handleNewBarrelChange}
-                  required
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="Lote"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Lote
-                </label>
-                <input
-                  type="text"
-                  name="Lote"
-                  id="Lote"
-                  value={newBarrelData.Lote}
-                  onChange={handleNewBarrelChange}
-                  required
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="GradoAlcoholico"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Grado Alcohólico (%)
-                </label>
-                <input
-                  type="number"
-                  step="0.1"
-                  name="GradoAlcoholico"
-                  id="GradoAlcoholico"
-                  value={newBarrelData.GradoAlcoholico}
-                  onChange={handleNewBarrelChange}
-                  required
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="CapacidadLitros"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Capacidad (Litros)
-                </label>
-                <input
-                  type="number"
-                  name="CapacidadLitros"
-                  id="CapacidadLitros"
-                  value={newBarrelData.CapacidadLitros}
-                  onChange={handleNewBarrelChange}
-                  required
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  name="isFull"
-                  id="isFull"
-                  checked={newBarrelData.isFull}
-                  onChange={handleNewBarrelChange}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label
-                  htmlFor="isFull"
-                  className="ml-2 block text-sm font-medium text-gray-700"
-                >
-                  ¿Está Lleno?
-                </label>
-              </div>
-            </div>
-            <button
-              type="submit"
-              className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out"
-            >
-              Crear Barril
-            </button>
-          </form>
-        )}
+      {showAddBarrelForm && (
+        <form
+  onSubmit={async (event) => {
+    event.preventDefault();
+
+    const nuevoBarril = {
+      capacidad: parseFloat(newBarrelData.CapacidadLitros),
+      esta_lleno_barril: newBarrelData.isFull,
+    };
+
+    try {
+      const resultado = await generarYGuardarBarril(nuevoBarril);
+
+      if (resultado.error) {
+        console.error('❌ Error al agregar el barril:', resultado.error);
+        alert('Error al agregar el barril: ' + resultado.error.message);
+      } else {
+        console.log('✅ Barril agregado con éxito:', resultado.data);
+        alert('Barril agregado con éxito.');
+
+        setNewBarrelData({
+          Nombre: '',
+          SaborPrincipal: '',
+          FechaElaboracion: '',
+          Lote: '',
+          GradoAlcoholico: '',
+          CapacidadLitros: '',
+          isFull: false,
+        });
+
+        // Opcional: cerrar el formulario
+        setShowAddBarrelForm(false);
+      }
+    } catch (error) {
+      console.error('❌ Error inesperado:', error);
+      alert('Error inesperado al guardar el barril.');
+    }
+  }}
+  className="bg-blue-50 p-6 rounded-lg shadow-inner mb-8"
+>
+  <h2 className="text-2xl font-semibold text-blue-800 mb-4">
+    Nuevo Barril
+  </h2>
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+    <div>
+      <label htmlFor="Nombre" className="block text-sm font-medium text-gray-700">
+        Nombre de Cerveza
+      </label>
+      <input
+        type="text"
+        name="Nombre"
+        id="Nombre"
+        value={newBarrelData.Nombre}
+        onChange={handleNewBarrelChange}
+        required
+        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+      />
+    </div>
+    <div>
+      <label htmlFor="SaborPrincipal" className="block text-sm font-medium text-gray-700">
+        Sabor Principal
+      </label>
+      <input
+        type="text"
+        name="SaborPrincipal"
+        id="SaborPrincipal"
+        value={newBarrelData.SaborPrincipal}
+        onChange={handleNewBarrelChange}
+        required
+        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+      />
+    </div>
+    <div>
+      <label htmlFor="FechaElaboracion" className="block text-sm font-medium text-gray-700">
+        Fecha de Elaboración
+      </label>
+      <input
+        type="date"
+        name="FechaElaboracion"
+        id="FechaElaboracion"
+        value={newBarrelData.FechaElaboracion}
+        onChange={handleNewBarrelChange}
+        required
+        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+      />
+    </div>
+    <div>
+      <label htmlFor="Lote" className="block text-sm font-medium text-gray-700">
+        Lote
+      </label>
+      <input
+        type="text"
+        name="Lote"
+        id="Lote"
+        value={newBarrelData.Lote}
+        onChange={handleNewBarrelChange}
+        required
+        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+      />
+    </div>
+    <div>
+      <label htmlFor="GradoAlcoholico" className="block text-sm font-medium text-gray-700">
+        Grado Alcohólico (%)
+      </label>
+      <input
+        type="number"
+        step="0.1"
+        name="GradoAlcoholico"
+        id="GradoAlcoholico"
+        value={newBarrelData.GradoAlcoholico}
+        onChange={handleNewBarrelChange}
+        required
+        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+      />
+    </div>
+    <div>
+      <label htmlFor="CapacidadLitros" className="block text-sm font-medium text-gray-700">
+        Capacidad (Litros)
+      </label>
+      <input
+        type="number"
+        name="CapacidadLitros"
+        id="CapacidadLitros"
+        value={newBarrelData.CapacidadLitros}
+        onChange={handleNewBarrelChange}
+        required
+        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+      />
+    </div>
+    <div className="flex items-center">
+      <input
+        type="checkbox"
+        name="isFull"
+        id="isFull"
+        checked={newBarrelData.isFull}
+        onChange={handleNewBarrelChange}
+        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+      />
+      <label htmlFor="isFull" className="ml-2 block text-sm font-medium text-gray-700">
+        ¿Está Lleno?
+      </label>
+    </div>
+  </div>
+  <button
+    type="submit"
+    className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out"
+  >
+    Crear Barril
+  </button>
+</form>
+      )}
+
 
         {/* Barra de búsqueda */}
         <div className="mb-6">
